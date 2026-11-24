@@ -1,0 +1,265 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { ArrowRight, Box, Layers, Printer, Sparkles, Star, Truck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { ModelStage } from "@/components/site/ModelStage";
+import { ProductCard } from "@/components/site/ProductCard";
+import { productsQuery } from "@/lib/products-query";
+import decorImg from "@/assets/collection-decor.jpg";
+import miniImg from "@/assets/collection-miniatures.jpg";
+import gadgetImg from "@/assets/collection-gadgets.jpg";
+import cosplayImg from "@/assets/collection-cosplay.jpg";
+
+export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Fakhr — Printed Layer by Layer, Made for You" },
+      {
+        name: "description",
+        content:
+          "Ready-made 3D prints for your home, desk, tabletop and cosplay. Printed layer by layer and shipped to your door.",
+      },
+      { property: "og:title", content: "Fakhr — Printed Layer by Layer, Made for You" },
+      {
+        property: "og:description",
+        content: "Ready-made 3D prints for your home, desk, tabletop and cosplay.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(productsQuery()),
+  component: Index,
+});
+
+const COLLECTIONS = [
+  { name: "Home Decor", img: decorImg, accent: "bg-filament-orange", blurb: "Vases, planters & lamps" },
+  { name: "Miniatures", img: miniImg, accent: "bg-filament-teal", blurb: "Tabletop heroes & beasts" },
+  { name: "Gadgets", img: gadgetImg, accent: "bg-filament-violet", blurb: "Stands, mounts & organizers" },
+  { name: "Cosplay", img: cosplayImg, accent: "bg-filament-orange", blurb: "Helmets, armor & props" },
+];
+
+const STEPS = [
+  { icon: Box, title: "Model", text: "Every piece starts as a carefully tuned 3D design." },
+  { icon: Layers, title: "Slice", text: "The model is cut into hundreds of ultra-thin layers." },
+  { icon: Printer, title: "Print", text: "Our printers build it up, one layer at a time." },
+  { icon: Sparkles, title: "Finish", text: "Supports removed, edges cleaned, checked by hand." },
+  { icon: Truck, title: "Ship", text: "Packed safely and sent straight to your door." },
+];
+
+function Index() {
+  return (
+    <>
+      <Hero />
+      <Collections />
+      <BestSellers />
+      <HowItsMade />
+      <Reviews />
+    </>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 bg-glow" />
+      <div className="pointer-events-none absolute inset-0 bg-layers opacity-60" />
+      <div className="relative mx-auto grid max-w-7xl items-center gap-6 px-4 pb-16 pt-10 sm:px-6 lg:grid-cols-2 lg:pb-24 lg:pt-16">
+        <div className="animate-rise space-y-7">
+          <p className="eyebrow flex items-center gap-2">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+            Fresh off the print bed
+          </p>
+          <h1 className="text-4xl font-semibold leading-[1.05] sm:text-5xl lg:text-6xl">
+            Printed Layer by Layer,{" "}
+            <span className="text-filament">Made for You.</span>
+          </h1>
+          <p className="max-w-md text-lg text-muted-foreground">
+            Ready-made 3D prints for your shelves, desk, tabletop and next convention — crafted
+            in vivid filament and finished by hand.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Button variant="hero" size="xl" asChild>
+              <Link to="/shop">
+                Shop all prints <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button variant="glass" size="xl" asChild>
+              <Link to="/shop" search={{ category: "Cosplay" }}>
+                Explore cosplay
+              </Link>
+            </Button>
+          </div>
+          <div className="flex gap-8 pt-2 font-mono text-xs text-muted-foreground">
+            <div>
+              <p className="font-display text-2xl text-foreground">0.12mm</p>
+              layer detail
+            </div>
+            <div>
+              <p className="font-display text-2xl text-foreground">3</p>
+              materials
+            </div>
+            <div>
+              <p className="font-display text-2xl text-foreground">4</p>
+              collections
+            </div>
+          </div>
+        </div>
+        <div className="relative h-[380px] sm:h-[460px] lg:h-[560px]">
+          <div className="absolute inset-x-10 bottom-6 top-10 rounded-full bg-filament opacity-15 blur-3xl" />
+          <ModelStage colors={["#ff7a2f", "#a855f7", "#2dd4bf"]} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SectionHead({
+  eyebrow,
+  title,
+  action,
+}: {
+  eyebrow: string;
+  title: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <div className="space-y-2">
+        <p className="eyebrow">{eyebrow}</p>
+        <h2 className="text-3xl font-semibold sm:text-4xl">{title}</h2>
+      </div>
+      {action}
+    </div>
+  );
+}
+
+function Collections() {
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+      <SectionHead eyebrow="01 — Collections" title="Find your next print" />
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {COLLECTIONS.map((c, i) => (
+          <Link
+            key={c.name}
+            to="/shop"
+            search={{ category: c.name }}
+            className="group relative aspect-[3/4] overflow-hidden rounded-2xl border border-border shadow-card animate-rise"
+            style={{ animationDelay: `${i * 90}ms` }}
+          >
+            <img
+              src={c.img}
+              alt={`${c.name} 3D prints`}
+              loading="lazy"
+              width={600}
+              height={800}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+              <span className={`mb-3 block h-1 w-10 rounded-full ${c.accent} transition-all duration-500 group-hover:w-20`} />
+              <h3 className="text-lg font-semibold sm:text-xl">{c.name}</h3>
+              <p className="text-xs text-muted-foreground sm:text-sm">{c.blurb}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function BestSellers() {
+  const { data: products } = useSuspenseQuery(productsQuery());
+  const list = products.slice(0, 10);
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+      <SectionHead
+        eyebrow="02 — Best sellers"
+        title="Crowd favorites"
+        action={
+          <Button variant="glass" asChild>
+            <Link to="/shop">
+              View all <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        }
+      />
+      {list.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-border bg-surface/40 p-12 text-center text-muted-foreground">
+          No products found yet — new prints are on the way.
+        </div>
+      ) : (
+        <Carousel opts={{ align: "start", loop: list.length > 3 }} className="relative">
+          <CarouselContent className="-ml-4">
+            {list.map((p) => (
+              <CarouselItem key={p.id} className="basis-[78%] pl-4 sm:basis-1/2 lg:basis-1/4">
+                <ProductCard product={p} className="h-full" />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <div className="mt-6 flex justify-end gap-2">
+            <CarouselPrevious className="static translate-y-0 border-border bg-surface" />
+            <CarouselNext className="static translate-y-0 border-border bg-surface" />
+          </div>
+        </Carousel>
+      )}
+    </section>
+  );
+}
+
+function HowItsMade() {
+  return (
+    <section className="relative py-20">
+      <div className="pointer-events-none absolute inset-0 bg-layers opacity-50" />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+        <SectionHead eyebrow="03 — How it's made" title="From file to your hands" />
+        <ol className="relative grid gap-8 md:grid-cols-5 md:gap-4">
+          <div className="absolute left-6 top-6 hidden h-0.5 w-[calc(100%-3rem)] bg-filament opacity-40 md:block" />
+          <div className="absolute bottom-6 left-6 top-6 w-0.5 bg-filament opacity-40 md:hidden" />
+          {STEPS.map((s, i) => (
+            <li key={s.title} className="relative flex gap-5 md:flex-col md:gap-4">
+              <div className="relative z-10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl border border-border bg-surface-raised text-primary shadow-glow">
+                <s.icon className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-mono text-xs text-muted-foreground">0{i + 1}</p>
+                <h3 className="text-lg font-semibold">{s.title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{s.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+function Reviews() {
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+      <SectionHead eyebrow="04 — Reviews" title="What customers say" />
+      <div className="grid gap-4 md:grid-cols-3">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="flex min-h-44 flex-col justify-between rounded-2xl border border-dashed border-border bg-surface/40 p-6"
+          >
+            <div className="flex gap-1 text-muted-foreground/40">
+              {Array.from({ length: 5 }).map((_, j) => (
+                <Star key={j} className="h-4 w-4" />
+              ))}
+            </div>
+            <p className="text-muted-foreground">No reviews yet</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
